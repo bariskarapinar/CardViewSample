@@ -1,15 +1,24 @@
 package com.myapp.cardviewsample.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
+import com.myapp.cardviewsample.model.ColorfulItem
+import com.myapp.cardviewsample.ui.theme.CardViewSampleTheme
 import com.myapp.cardviewsample.viewmodel.CardViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -19,30 +28,52 @@ fun CardListScreen(
     onItemClick: (Int) -> Unit
 ) {
     val items by viewModel.items.collectAsState()
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            CenterAlignedTopAppBar(
+            LargeTopAppBar(
                 title = {
-                    Text(
-                        "Colorful MVVM Cards",
-                        fontWeight = FontWeight.ExtraBold,
-                        style = MaterialTheme.typography.headlineMedium
-                    )
+                    Column {
+                        Text(
+                            "Colorful Worlds",
+                            fontWeight = FontWeight.Black,
+                            style = MaterialTheme.typography.headlineLarge,
+                            letterSpacing = (-1).sp
+                        )
+                        Text(
+                            "Discover your vibe",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                scrollBehavior = scrollBehavior,
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    scrolledContainerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
                 )
             )
         }
     ) { paddingValues ->
-        LazyColumn(
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
-            contentPadding = PaddingValues(12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+                .padding(paddingValues)
+                .background(
+                    Brush.verticalGradient(
+                        listOf(
+                            MaterialTheme.colorScheme.surface,
+                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                        )
+                    )
+                ),
+            contentPadding = PaddingValues(top = 8.dp, start = 16.dp, end = 16.dp, bottom = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(items, key = { it.id }) { item ->
                 ColorfulCard(
@@ -51,5 +82,16 @@ fun CardListScreen(
                 )
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CardListScreenPreview() {
+    CardViewSampleTheme {
+        CardListScreen(
+            viewModel = CardViewModel(),
+            onItemClick = {}
+        )
     }
 }

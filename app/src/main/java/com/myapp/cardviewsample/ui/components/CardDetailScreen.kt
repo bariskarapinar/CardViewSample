@@ -13,14 +13,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.myapp.cardviewsample.model.ColorfulItem
+import com.myapp.cardviewsample.ui.theme.CardViewSampleTheme
 import com.myapp.cardviewsample.viewmodel.CardViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CardDetailScreen(
     itemId: Int,
@@ -28,7 +31,15 @@ fun CardDetailScreen(
     onBackClick: () -> Unit
 ) {
     val item = viewModel.getItemById(itemId) ?: return
+    CardDetailContent(item = item, onBackClick = onBackClick)
+}
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CardDetailContent(
+    item: ColorfulItem,
+    onBackClick: () -> Unit
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -121,8 +132,10 @@ fun CardDetailScreen(
                             )
                         )
                         Spacer(modifier = Modifier.height(8.dp))
+                        
+                        val colorHex = String.format("#%06X", item.backgroundColor.toArgb() and 0xFFFFFF)
                         Text(
-                            text = "#${Integer.toHexString(item.backgroundColor.value.toInt()).uppercase()}",
+                            text = colorHex,
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 color = Color.White,
                                 fontWeight = FontWeight.Bold,
@@ -133,5 +146,22 @@ fun CardDetailScreen(
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CardDetailScreenPreview() {
+    CardViewSampleTheme {
+        CardDetailContent(
+            item = ColorfulItem(
+                id = 1,
+                title = "Summer Vibe",
+                description = "Golden sands and blue oceans.",
+                backgroundColor = Color(0xFFFFD700),
+                icon = "☀️"
+            ),
+            onBackClick = {}
+        )
     }
 }
